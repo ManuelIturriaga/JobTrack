@@ -1,0 +1,5 @@
+{
+  "name": "JobTrack Pro",
+  "description": "A dual-state (Free/Premium) job tracking dashboard featuring Kanban boards, insights, and dynamic UI switching.",
+  "requestFramePermissions": []
+}
