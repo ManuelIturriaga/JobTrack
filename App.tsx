@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
+import MobileNavbar from './components/MobileNavbar';
 import Dashboard from './components/Dashboard';
 import Insights from './components/Insights';
 import Network from './components/Network';
 import Profile from './components/Profile';
 import AddJobModal from './components/AddJobModal';
+import BillingModal from './components/BillingModal';
 
 const App: React.FC = () => {
-  const [isPremium, setIsPremium] = useState<boolean>(true);
+  const [isPremium, setIsPremium] = useState<boolean>(false);
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<'dashboard' | 'insights' | 'network' | 'profile'>('dashboard');
   const [isAddJobModalOpen, setIsAddJobModalOpen] = useState<boolean>(false);
+  const [isBillingModalOpen, setIsBillingModalOpen] = useState<boolean>(false);
 
   // Handle Dark Mode Class on Body/HTML
   useEffect(() => {
@@ -23,7 +26,11 @@ const App: React.FC = () => {
   }, [isDarkMode]);
 
   const toggleTheme = () => setIsDarkMode(!isDarkMode);
-  const togglePremium = () => setIsPremium(!isPremium);
+  
+  const handleUpgrade = () => {
+    setIsPremium(true);
+    setIsBillingModalOpen(false);
+  };
 
   const renderPage = () => {
     switch (currentPage) {
@@ -31,7 +38,7 @@ const App: React.FC = () => {
         return (
           <Dashboard 
             isPremium={isPremium} 
-            onUpgrade={() => setIsPremium(true)}
+            onUpgrade={() => setIsBillingModalOpen(true)}
             onAddJob={() => setIsAddJobModalOpen(true)}
             onViewFullInsights={() => setCurrentPage('insights')}
           />
@@ -45,7 +52,7 @@ const App: React.FC = () => {
       default:
         return <Dashboard 
           isPremium={isPremium} 
-          onUpgrade={() => setIsPremium(true)}
+          onUpgrade={() => setIsBillingModalOpen(true)}
           onAddJob={() => setIsAddJobModalOpen(true)}
           onViewFullInsights={() => setCurrentPage('insights')}
         />;
@@ -53,7 +60,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 transition-colors duration-200 font-sans">
+    <div className="min-h-screen bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 transition-colors duration-200 font-sans pb-20 md:pb-0">
       <Navbar 
         isPremium={isPremium} 
         toggleTheme={toggleTheme}
@@ -64,19 +71,31 @@ const App: React.FC = () => {
       
       {renderPage()}
 
+      <MobileNavbar 
+        currentPage={currentPage}
+        onNavigate={setCurrentPage}
+      />
+
       {isAddJobModalOpen && (
         <AddJobModal onClose={() => setIsAddJobModalOpen(false)} />
       )}
 
-      {/* Floating Toggle for Demo Purposes */}
-      <div className="fixed bottom-6 right-6 flex flex-col gap-2 z-50">
-        <div className="bg-white dark:bg-slate-800 p-2 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 flex flex-col items-center gap-2">
-            <span className="text-[10px] uppercase font-bold text-slate-400">Demo Controls</span>
+      {isBillingModalOpen && (
+        <BillingModal 
+          onClose={() => setIsBillingModalOpen(false)} 
+          onConfirm={handleUpgrade}
+        />
+      )}
+
+      {/* Floating Toggle for Demo Purposes (Optional - kept for dev testing) */}
+      <div className="fixed bottom-24 right-6 flex flex-col gap-2 z-40 md:bottom-6">
+        <div className="bg-white dark:bg-slate-800 p-2 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 flex flex-col items-center gap-2 opacity-50 hover:opacity-100 transition-opacity">
+            <span className="text-[10px] uppercase font-bold text-slate-400">Dev Controls</span>
             <button 
-                onClick={togglePremium}
+                onClick={() => setIsPremium(!isPremium)}
                 className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${isPremium ? 'bg-premium text-white' : 'bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300'}`}
             >
-                {isPremium ? 'View Free Version' : 'View Premium Version'}
+                {isPremium ? 'Toggle Free' : 'Toggle Premium'}
             </button>
         </div>
       </div>

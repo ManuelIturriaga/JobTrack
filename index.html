@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>JobTrack Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
@@ -40,6 +40,7 @@
     <style>
       body {
         font-family: 'Inter', sans-serif;
+        -webkit-tap-highlight-color: transparent;
       }
       .premium-border {
         border: 1px solid rgba(212, 175, 55, 0.3);
@@ -88,19 +89,23 @@
           user-select: none;
           pointer-events: none;
       }
+      /* Safe area padding for mobile bottom nav */
+      .safe-area-pb {
+          padding-bottom: env(safe-area-inset-bottom, 20px);
+      }
     </style>
   <script type="importmap">
 {
   "imports": {
+    "react/": "https://esm.sh/react@^19.2.3/",
     "react": "https://esm.sh/react@^19.2.3",
     "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "react/": "https://esm.sh/react@^19.2.3/",
     "lucide-react": "https://esm.sh/lucide-react@^0.562.0"
   }
 }
 </script>
 </head>
-  <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen transition-colors duration-200 font-sans">
+  <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen transition-colors duration-200 font-sans pb-24 md:pb-0">
     
     <!-- LOGIN VIEW (Initial State) -->
     <main id="view-login" class="min-h-screen flex flex-col items-center justify-center p-6 animate-fadeIn relative overflow-hidden">
@@ -152,7 +157,7 @@
 
     <!-- MAIN APP LAYOUT (Hidden Initially) -->
     <div id="main-app" class="hidden">
-        <!-- Navbar -->
+        <!-- Desktop Navbar -->
         <nav class="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-6 py-3 flex items-center justify-between transition-colors duration-300">
         <div class="flex items-center gap-4 cursor-pointer" onclick="switchView('dashboard')">
             <div class="relative group">
@@ -174,15 +179,15 @@
             </div>
         </div>
 
-        <!-- Navigation Links -->
+        <!-- Desktop Navigation Links -->
         <div class="hidden md:flex items-center gap-8 ml-12">
-            <button onclick="switchView('dashboard')" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-lg transition-all cursor-pointer text-primary font-semibold bg-blue-50 dark:bg-blue-900/20" id="nav-dashboard">
+            <button onclick="switchView('dashboard')" class="nav-btn-desktop flex items-center gap-2 px-3 py-2 rounded-lg transition-all cursor-pointer text-primary font-semibold bg-blue-50 dark:bg-blue-900/20" id="nav-desk-dashboard">
             <span class="material-symbols-outlined text-[20px]">dashboard</span> Dashboard
             </button>
-            <button onclick="switchView('insights')" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-lg transition-all cursor-pointer text-slate-500 dark:text-slate-400 hover:text-primary" id="nav-insights">
+            <button onclick="switchView('insights')" class="nav-btn-desktop flex items-center gap-2 px-3 py-2 rounded-lg transition-all cursor-pointer text-slate-500 dark:text-slate-400 hover:text-primary" id="nav-desk-insights">
             <span class="material-symbols-outlined text-[20px]">analytics</span> Insights
             </button>
-            <button onclick="switchView('network')" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-lg transition-all cursor-pointer text-slate-500 dark:text-slate-400 hover:text-primary" id="nav-network">
+            <button onclick="switchView('network')" class="nav-btn-desktop flex items-center gap-2 px-3 py-2 rounded-lg transition-all cursor-pointer text-slate-500 dark:text-slate-400 hover:text-primary" id="nav-desk-network">
             <span class="material-symbols-outlined text-[20px]">group</span> Network
             </button>
         </div>
@@ -195,7 +200,7 @@
             <span class="material-symbols-outlined text-slate-500 dark:text-slate-400" id="theme-icon">dark_mode</span>
             </button>
             
-            <div class="h-8 w-[1px] bg-slate-200 dark:bg-slate-800"></div>
+            <div class="h-8 w-[1px] bg-slate-200 dark:bg-slate-800 hidden sm:block"></div>
             
             <div 
                 class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
@@ -238,6 +243,7 @@
                     </div>
         
                     <!-- Dynamic Stat Card (Free vs Premium) -->
+                    <!-- PREMIUM VERSION -->
                     <div id="stats-card-premium" class="hidden bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border flex items-center gap-4 min-w-[200px] transition-all premium-border shadow-premium border-premium/30">
                     <div class="p-2 rounded-lg bg-amber-100 dark:bg-amber-900/30 text-premium">
                         <span class="material-symbols-outlined">auto_awesome</span>
@@ -252,8 +258,9 @@
                     </div>
                     </div>
 
-                    <div id="stats-card-free" class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex items-center gap-4 min-w-[200px] opacity-80">
-                        <div class="p-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-400">
+                    <!-- FREE VERSION (Click to Upgrade) -->
+                    <div id="stats-card-free" onclick="openBillingModal()" class="cursor-pointer bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex items-center gap-4 min-w-[200px] opacity-100 hover:border-primary/50 transition-all group">
+                        <div class="p-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-400 group-hover:text-primary transition-colors">
                             <span class="material-symbols-outlined">lock</span>
                         </div>
                         <div>
@@ -262,7 +269,7 @@
                                 Advanced Stats
                             </p>
                             </div>
-                            <p class="text-sm font-medium italic text-slate-400">Upgrade to view</p>
+                            <p class="text-sm font-medium italic text-primary underline decoration-dotted">Upgrade to view</p>
                         </div>
                     </div>
         
@@ -276,151 +283,66 @@
                 </div>
         
                 <!-- Kanban Board -->
-                <div class="flex gap-6 overflow-x-auto pb-8 snap-x">
-                <!-- Column: Wishlist -->
-                <div class="flex-1 min-w-[320px] snap-start">
-                    <div class="flex items-center justify-between mb-4 px-1">
-                        <div class="flex items-center gap-2">
-                            <h3 class="font-bold text-slate-700 dark:text-slate-300">Wishlist</h3>
-                            <span class="px-2 py-0.5 rounded text-xs font-bold bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300">8</span>
-                        </div>
-                        <button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
-                            <span class="material-symbols-outlined">more_horiz</span>
-                        </button>
-                    </div>
-                    <div class="space-y-4">
-                        <!-- Card 1 -->
-                        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 hover:border-primary/50 dark:hover:border-primary/50 transition-all cursor-pointer group relative overflow-hidden">
-                            <div class="flex justify-between items-start mb-3">
-                                <div class="h-10 w-10 bg-slate-100 dark:bg-slate-700 rounded-lg flex items-center justify-center font-bold text-slate-400">G</div>
-                                <span class="text-[10px] font-bold px-2 py-1 rounded-full uppercase bg-slate-100 dark:bg-slate-700 text-slate-500">Junior</span>
-                            </div>
-                            <h4 class="font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">Product Designer</h4>
-                            <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Google • Remote</p>
-                            <div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-700">
-                                <span class="text-[10px] text-slate-400">Added 2d ago</span>
-                                <div class="flex items-center gap-1 premium-only-feature">
-                                    <span class="material-symbols-outlined text-[14px]">star</span>
-                                    <span class="text-xs font-bold">92% Match</span>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Card 2 -->
-                        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 hover:border-primary/50 dark:hover:border-primary/50 transition-all cursor-pointer group relative overflow-hidden">
-                            <div class="flex justify-between items-start mb-3">
-                                <div class="h-10 w-10 bg-slate-100 dark:bg-slate-700 rounded-lg flex items-center justify-center font-bold text-slate-400">F</div>
-                                <span class="text-[10px] font-bold px-2 py-1 rounded-full uppercase bg-slate-100 dark:bg-slate-700 text-slate-500">Junior</span>
-                            </div>
-                            <h4 class="font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">UI Engineer</h4>
-                            <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Figma • San Francisco</p>
-                            <div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-700">
-                                <span class="text-[10px] text-slate-400">Added 5d ago</span>
-                                <div class="flex items-center gap-1 premium-only-feature">
-                                    <span class="material-symbols-outlined text-[14px]">star</span>
-                                    <span class="text-xs font-bold">88% Match</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Column: Applied -->
-                <div class="flex-1 min-w-[320px] snap-start">
-                    <div class="flex items-center justify-between mb-4 px-1">
-                        <div class="flex items-center gap-2">
-                            <h3 class="font-bold text-slate-700 dark:text-slate-300">Applied</h3>
-                            <span class="px-2 py-0.5 rounded text-xs font-bold bg-blue-100 dark:bg-blue-900/30 text-primary">12</span>
-                        </div>
-                        <button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
-                            <span class="material-symbols-outlined">more_horiz</span>
-                        </button>
-                    </div>
-                    <div class="space-y-4">
-                        <!-- Card 3 -->
-                        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 hover:border-primary/50 dark:hover:border-primary/50 transition-all cursor-pointer group relative overflow-hidden">
-                            <div class="flex justify-between items-start mb-3">
-                                <div class="h-10 w-10 bg-slate-100 dark:bg-slate-700 rounded-lg flex items-center justify-center font-bold text-slate-400">S</div>
-                                <span class="text-[10px] font-bold px-2 py-1 rounded-full uppercase bg-blue-50 dark:bg-blue-900/20 text-primary">PENDING</span>
-                            </div>
-                            <h4 class="font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">Frontend Developer</h4>
-                            <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Stripe • Remote</p>
-                            <div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-700">
-                                <div class="flex items-center gap-1 text-primary">
-                                    <span class="material-symbols-outlined text-[14px]">calendar_today</span>
-                                    <span class="text-xs font-semibold">Follow up in 3d</span>
-                                </div>
-                                <div class="flex items-center gap-1 premium-only-feature">
-                                    <span class="material-symbols-outlined text-[14px]">star</span>
-                                    <span class="text-xs font-bold">95% Match</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                    <!-- Column: Interviewing -->
+                <div class="flex gap-6 overflow-x-auto pb-8 snap-x no-scrollbar">
+                    <!-- Column: Wishlist -->
                     <div class="flex-1 min-w-[320px] snap-start">
                         <div class="flex items-center justify-between mb-4 px-1">
                             <div class="flex items-center gap-2">
-                                <h3 class="font-bold text-slate-700 dark:text-slate-300">Interviewing</h3>
-                                <span class="px-2 py-0.5 rounded text-xs font-bold bg-amber-100 dark:bg-amber-900/30 text-amber-600">3</span>
+                                <h3 class="font-bold text-slate-700 dark:text-slate-300">Wishlist</h3>
+                                <span class="px-2 py-0.5 rounded text-xs font-bold bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300">8</span>
                             </div>
                             <button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
                                 <span class="material-symbols-outlined">more_horiz</span>
                             </button>
                         </div>
                         <div class="space-y-4">
-                            <!-- Card 4 -->
-                            <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 hover:border-primary/50 dark:hover:border-primary/50 transition-all cursor-pointer group relative overflow-hidden premium-border shadow-premium border-l-4 border-l-premium">
-                                <div class="absolute top-0 right-0 p-1 bg-premium text-white text-[8px] font-bold px-2 rounded-bl-lg">TOP MATCH</div>
+                            <!-- Card 1 -->
+                            <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 hover:border-primary/50 dark:hover:border-primary/50 transition-all cursor-pointer group relative overflow-hidden">
                                 <div class="flex justify-between items-start mb-3">
-                                    <div class="h-10 w-10 bg-slate-100 dark:bg-slate-700 rounded-lg flex items-center justify-center font-bold text-slate-400">A</div>
-                                    <span class="text-[10px] font-bold px-2 py-1 rounded-full uppercase bg-amber-50 dark:bg-amber-900/20 text-amber-600">ROUND 2</span>
+                                    <div class="h-10 w-10 bg-slate-100 dark:bg-slate-700 rounded-lg flex items-center justify-center font-bold text-slate-400">G</div>
+                                    <span class="text-[10px] font-bold px-2 py-1 rounded-full uppercase bg-slate-100 dark:bg-slate-700 text-slate-500">Junior</span>
                                 </div>
-                                <h4 class="font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">UX Researcher</h4>
-                                <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Airbnb • Hybrid</p>
+                                <h4 class="font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">Product Designer</h4>
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Google • Remote</p>
+                                <div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-700">
+                                    <span class="text-[10px] text-slate-400">Added 2d ago</span>
+                                    <div class="flex items-center gap-1 premium-only-feature">
+                                        <span class="material-symbols-outlined text-[14px]">star</span>
+                                        <span class="text-xs font-bold">92% Match</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Column: Applied -->
+                    <div class="flex-1 min-w-[320px] snap-start">
+                        <div class="flex items-center justify-between mb-4 px-1">
+                            <div class="flex items-center gap-2">
+                                <h3 class="font-bold text-slate-700 dark:text-slate-300">Applied</h3>
+                                <span class="px-2 py-0.5 rounded text-xs font-bold bg-blue-100 dark:bg-blue-900/30 text-primary">12</span>
+                            </div>
+                             <button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                                <span class="material-symbols-outlined">more_horiz</span>
+                            </button>
+                        </div>
+                        <div class="space-y-4">
+                            <!-- Card 2 -->
+                            <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 hover:border-primary/50 dark:hover:border-primary/50 transition-all cursor-pointer group relative overflow-hidden">
+                                <div class="flex justify-between items-start mb-3">
+                                    <div class="h-10 w-10 bg-slate-100 dark:bg-slate-700 rounded-lg flex items-center justify-center font-bold text-slate-400">S</div>
+                                    <span class="text-[10px] font-bold px-2 py-1 rounded-full uppercase bg-blue-50 dark:bg-blue-900/20 text-primary">PENDING</span>
+                                </div>
+                                <h4 class="font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">Frontend Developer</h4>
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Stripe • Remote</p>
                                 <div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-700">
                                     <div class="flex items-center gap-1 text-primary">
                                         <span class="material-symbols-outlined text-[14px]">calendar_today</span>
-                                        <span class="text-xs font-semibold">Tomorrow, 2:00 PM</span>
+                                        <span class="text-xs font-semibold">Follow up in 3d</span>
                                     </div>
                                     <div class="flex items-center gap-1 premium-only-feature">
                                         <span class="material-symbols-outlined text-[14px]">star</span>
-                                        <span class="text-xs font-bold">98% Match</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Column: Offers -->
-                    <div class="flex-1 min-w-[320px] snap-start">
-                        <div class="flex items-center justify-between mb-4 px-1">
-                            <div class="flex items-center gap-2">
-                                <h3 class="font-bold text-slate-700 dark:text-slate-300">Offers</h3>
-                                <span class="px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600">1</span>
-                            </div>
-                            <button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
-                                <span class="material-symbols-outlined">more_horiz</span>
-                            </button>
-                        </div>
-                        <div class="space-y-4">
-                            <!-- Card 6 -->
-                            <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 hover:border-primary/50 dark:hover:border-primary/50 transition-all cursor-pointer group relative overflow-hidden">
-                                <div class="absolute top-0 right-0 p-1 bg-emerald-500 text-white text-[8px] font-bold px-2 rounded-bl-lg">NEW OFFER</div>
-                                <div class="flex justify-between items-start mb-3">
-                                    <div class="h-10 w-10 bg-slate-100 dark:bg-slate-700 rounded-lg flex items-center justify-center font-bold text-slate-400">S</div>
-                                </div>
-                                <h4 class="font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 transition-colors">Design Lead</h4>
-                                <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Spotify • Stockholm</p>
-                                <div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-700">
-                                    <div class="flex items-center gap-1 text-emerald-600">
-                                        <span class="material-symbols-outlined text-[14px]">check_circle</span>
-                                        <span class="text-xs font-bold">$140k + Equity</span>
-                                    </div>
-                                    <div class="flex items-center gap-1 premium-only-feature">
-                                        <span class="material-symbols-outlined text-[14px]">star</span>
-                                        <span class="text-xs font-bold">99% Match</span>
+                                        <span class="text-xs font-bold">95% Match</span>
                                     </div>
                                 </div>
                             </div>
@@ -566,8 +488,8 @@
                             </p>
                             
                             <button 
-                                onclick="handleLogin('premium')"
-                                class="w-full bg-primary hover:bg-blue-600 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-blue-600/20 active:scale-95"
+                                onclick="openBillingModal()"
+                                class="w-full bg-primary hover:bg-blue-600 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-blue-600/20 active:scale-95 flex items-center justify-center gap-2"
                             >
                                 Learn More
                             </button>
@@ -589,16 +511,18 @@
                     <button class="px-4 py-2 text-sm font-medium text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">Yearly</button>
                     </div>
                 </div>
-                <!-- Content same as before, hidden logic handled by switchView/login -->
+                <!-- Locked State -->
                 <div id="insights-content-locked" class="hidden flex flex-col items-center justify-center py-20 bg-slate-50 dark:bg-slate-900 rounded-3xl border border-dashed border-slate-300 dark:border-slate-700">
                      <span class="material-symbols-outlined text-6xl text-slate-300 mb-4">lock</span>
                      <h2 class="text-2xl font-bold text-slate-700 dark:text-slate-300">Premium Feature</h2>
                      <p class="text-slate-500 mb-6">Advanced analytics are available for Gold Members.</p>
-                     <button onclick="handleLogin('premium')" class="bg-primary text-white px-6 py-2 rounded-xl font-bold">Upgrade Now</button>
+                     <button onclick="openBillingModal()" class="bg-primary text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-blue-600 transition-all">Upgrade Now</button>
                 </div>
+                <!-- Unlocked Content -->
                 <div id="insights-content-unlocked">
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                         <div class="lg:col-span-2 bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <!-- Graphs (CSS Mocked) -->
                         <div class="flex items-center justify-between mb-8">
                             <div>
                             <h3 class="font-bold text-lg text-slate-900 dark:text-white">Application Velocity</h3>
@@ -616,33 +540,29 @@
                             </div>
                         </div>
                         <div class="h-64 flex items-end justify-between gap-2 px-2">
-                            <div class="flex-1 flex flex-col items-center gap-2 group">
-                            <div class="w-full flex items-end gap-1 h-full">
-                                <div class="bg-primary/20 w-1/2 rounded-t-md h-[40%]"></div>
-                                <div class="bg-premium/40 w-1/2 rounded-t-md h-[10%]"></div>
-                            </div>
-                            <span class="text-[10px] text-slate-400 font-medium">W1</span>
-                            </div>
-                            <div class="flex-1 flex flex-col items-center gap-2 group">
-                            <div class="w-full flex items-end gap-1 h-full">
-                                <div class="bg-primary/20 w-1/2 rounded-t-md h-[65%]"></div>
-                                <div class="bg-premium/40 w-1/2 rounded-t-md h-[25%]"></div>
-                            </div>
-                            <span class="text-[10px] text-slate-400 font-medium">W2</span>
+                             <div class="flex-1 flex flex-col items-center gap-2 group">
+                                <div class="w-full flex items-end gap-1 h-full">
+                                    <div class="bg-primary/20 w-1/2 rounded-t-md h-[40%]"></div>
+                                    <div class="bg-premium/40 w-1/2 rounded-t-md h-[10%]"></div>
+                                </div>
                             </div>
                             <div class="flex-1 flex flex-col items-center gap-2 group">
-                            <div class="w-full flex items-end gap-1 h-full">
-                                <div class="bg-primary w-1/2 rounded-t-md h-[85%]"></div>
-                                <div class="bg-premium w-1/2 rounded-t-md h-[45%]"></div>
+                                <div class="w-full flex items-end gap-1 h-full">
+                                    <div class="bg-primary/20 w-1/2 rounded-t-md h-[65%]"></div>
+                                    <div class="bg-premium/40 w-1/2 rounded-t-md h-[25%]"></div>
+                                </div>
                             </div>
-                            <span class="text-[10px] text-slate-400 font-medium">W3</span>
+                             <div class="flex-1 flex flex-col items-center gap-2 group">
+                                <div class="w-full flex items-end gap-1 h-full">
+                                    <div class="bg-primary/20 w-1/2 rounded-t-md h-[85%]"></div>
+                                    <div class="bg-premium/40 w-1/2 rounded-t-md h-[55%]"></div>
+                                </div>
                             </div>
-                            <div class="flex-1 flex flex-col items-center gap-2 group">
-                            <div class="w-full flex items-end gap-1 h-full">
-                                <div class="bg-primary/20 w-1/2 rounded-t-md h-[60%]"></div>
-                                <div class="bg-premium/40 w-1/2 rounded-t-md h-[20%]"></div>
-                            </div>
-                            <span class="text-[10px] text-slate-400 font-medium">W4</span>
+                             <div class="flex-1 flex flex-col items-center gap-2 group">
+                                <div class="w-full flex items-end gap-1 h-full">
+                                    <div class="bg-primary/20 w-1/2 rounded-t-md h-[60%]"></div>
+                                    <div class="bg-premium/40 w-1/2 rounded-t-md h-[20%]"></div>
+                                </div>
                             </div>
                         </div>
                         </div>
@@ -670,156 +590,15 @@
                                 <div class="bg-premium h-full rounded-full" style="width: 4.2%"></div>
                             </div>
                             </div>
-                            <div class="pt-6 border-t border-slate-100 dark:border-slate-700">
-                            <div class="flex items-center gap-4">
-                                <div class="h-12 w-12 rounded-2xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600">
-                                <span class="material-symbols-outlined">trending_up</span>
-                                </div>
-                                <div>
-                                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Improvement</p>
-                                <p class="text-sm font-bold text-slate-900 dark:text-white">+12.4% vs last month</p>
-                                </div>
-                            </div>
-                            </div>
                         </div>
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                        <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700">
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Avg Match Score</p>
-                        <div class="flex items-end gap-2 mb-4">
-                            <span class="text-3xl font-bold text-slate-900 dark:text-white">84%</span>
-                            <span class="text-xs text-emerald-500 font-bold mb-1">+5%</span>
-                        </div>
-                        <div class="flex gap-1 items-end h-8">
-                            <div class="flex-1 bg-slate-100 dark:bg-slate-700 h-4 rounded-sm"></div>
-                            <div class="flex-1 bg-slate-100 dark:bg-slate-700 h-6 rounded-sm"></div>
-                            <div class="flex-1 bg-primary h-8 rounded-sm"></div>
-                            <div class="flex-1 bg-primary/60 h-7 rounded-sm"></div>
-                        </div>
-                        </div>
-                        <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700">
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Response Time</p>
-                        <div class="flex items-end gap-2 mb-4">
-                            <span class="text-3xl font-bold text-slate-900 dark:text-white">4.2d</span>
-                            <span class="text-xs text-emerald-500 font-bold mb-1">-1.2d</span>
-                        </div>
-                        <div class="flex gap-1 items-end h-8">
-                            <div class="flex-1 bg-primary h-8 rounded-sm"></div>
-                            <div class="flex-1 bg-primary/60 h-6 rounded-sm"></div>
-                            <div class="flex-1 bg-slate-100 dark:bg-slate-700 h-5 rounded-sm"></div>
-                            <div class="flex-1 bg-slate-100 dark:bg-slate-700 h-4 rounded-sm"></div>
-                        </div>
-                        </div>
-                        <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700">
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Offer Rate</p>
-                        <div class="flex items-end gap-2 mb-4">
-                            <span class="text-3xl font-bold text-slate-900 dark:text-white">2.1%</span>
-                            <span class="text-xs text-slate-400 font-bold mb-1">Stable</span>
-                        </div>
-                        <div class="flex gap-1 items-end h-8">
-                            <div class="flex-1 bg-slate-100 dark:bg-slate-700 h-5 rounded-sm"></div>
-                            <div class="flex-1 bg-slate-100 dark:bg-slate-700 h-5 rounded-sm"></div>
-                            <div class="flex-1 bg-primary h-5 rounded-sm"></div>
-                            <div class="flex-1 bg-primary/60 h-5 rounded-sm"></div>
-                        </div>
-                        </div>
-                        <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700">
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Market Rank</p>
-                        <div class="flex items-end gap-2 mb-4">
-                            <span class="text-3xl font-bold text-slate-900 dark:text-white">Top 8%</span>
-                            <span class="text-xs text-premium font-bold mb-1">Elite</span>
-                        </div>
-                        <div class="flex gap-1 items-end h-8">
-                            <div class="flex-1 bg-premium h-8 rounded-sm"></div>
-                            <div class="flex-1 bg-premium/60 h-7 rounded-sm"></div>
-                            <div class="flex-1 bg-slate-100 dark:bg-slate-700 h-3 rounded-sm"></div>
-                            <div class="flex-1 bg-slate-100 dark:bg-slate-700 h-2 rounded-sm"></div>
-                        </div>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div class="bg-white dark:bg-slate-800 p-8 rounded-3xl border border-slate-200 dark:border-slate-700">
-                        <div class="flex items-center justify-between mb-8">
-                            <div>
-                            <h3 class="font-bold text-xl text-slate-900 dark:text-white">Salary Benchmarking</h3>
-                            <p class="text-sm text-slate-500">Your current offers vs industry standards (Junior Roles)</p>
-                            </div>
-                            <div class="h-10 w-10 bg-blue-50 dark:bg-blue-900/20 rounded-xl flex items-center justify-center text-primary">
-                            <span class="material-symbols-outlined">payments</span>
-                            </div>
-                        </div>
-                        <div class="space-y-6">
-                            <div class="relative pt-4">
-                            <div class="flex justify-between text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
-                                <span>Entry Level</span>
-                                <span>$120k</span>
-                            </div>
-                            <div class="h-4 bg-slate-100 dark:bg-slate-700 rounded-full relative">
-                                <div class="absolute inset-y-0 left-1/4 right-1/4 bg-slate-200 dark:bg-slate-600 rounded-full border-x-2 border-white dark:border-slate-800"></div>
-                                <div class="absolute -top-2 left-[65%] transform -translate-x-1/2 flex flex-col items-center">
-                                <div class="h-8 w-1 bg-premium"></div>
-                                <span class="mt-1 text-[10px] font-bold bg-premium text-white px-2 py-0.5 rounded">YOUR RANGE</span>
-                                </div>
-                            </div>
-                            <div class="flex justify-between mt-2 text-[10px] text-slate-500">
-                                <span>$45k</span>
-                                <span>Market Median: $72k</span>
-                                <span>$120k</span>
-                            </div>
-                            </div>
-                            <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 mt-4">
-                            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                                <span class="material-symbols-outlined text-premium text-sm align-middle mr-1">auto_awesome</span>
-                                Insights: Your profile is currently command a <b>15% premium</b> over the market median due to your <i>Specialized AI</i> project portfolio.
-                            </p>
-                            </div>
-                        </div>
-                        </div>
-                        <div class="bg-white dark:bg-slate-800 p-8 rounded-3xl border border-slate-200 dark:border-slate-700">
-                        <div class="flex items-center justify-between mb-8">
-                            <div>
-                            <h3 class="font-bold text-xl text-slate-900 dark:text-white">Skill Gap Analysis</h3>
-                            <p class="text-sm text-slate-500">Matching your profile to target job descriptions</p>
-                            </div>
-                            <div class="h-10 w-10 bg-amber-50 dark:bg-amber-900/20 rounded-xl flex items-center justify-center text-premium">
-                            <span class="material-symbols-outlined">psychology</span>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="p-4 bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/30 rounded-2xl">
-                            <p class="text-xs font-bold text-emerald-600 uppercase mb-3">Top Strengths</p>
-                            <div class="flex flex-wrap gap-2">
-                                <span class="text-[10px] font-bold px-2 py-1 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 rounded-md">UI/UX Design</span>
-                                <span class="text-[10px] font-bold px-2 py-1 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 rounded-md">React</span>
-                                <span class="text-[10px] font-bold px-2 py-1 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 rounded-md">Figma</span>
-                            </div>
-                            </div>
-                            <div class="p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/30 rounded-2xl">
-                            <p class="text-xs font-bold text-amber-600 uppercase mb-3">Top Gaps</p>
-                            <div class="flex flex-wrap gap-2">
-                                <span class="text-[10px] font-bold px-2 py-1 bg-amber-100 dark:bg-amber-900/40 text-amber-700 rounded-md">Unit Testing</span>
-                                <span class="text-[10px] font-bold px-2 py-1 bg-amber-100 dark:bg-amber-900/40 text-amber-700 rounded-md">AWS Basics</span>
-                            </div>
-                            </div>
-                        </div>
-                        <div class="mt-6">
-                            <button class="w-full py-3 bg-slate-900 dark:bg-white dark:text-slate-900 text-white rounded-xl font-bold text-sm hover:opacity-90 transition-opacity">
-                            Generate Upskilling Plan
-                            </button>
-                        </div>
-                        </div>
-                    </div>
+                    <!-- More mocked data for insights... -->
                 </div>
-                <button class="fixed bottom-6 right-6 bg-premium text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-2 font-bold hover:scale-105 transition-transform z-40">
-                    <span class="material-symbols-outlined">smart_toy</span>
-                    AI Insights
-                </button>
             </main>
 
             <!-- NETWORK VIEW -->
             <main id="view-network" class="hidden p-6 max-w-[1600px] mx-auto animate-fadeIn pb-24">
-                <!-- Content same as previous -->
                  <div class="flex flex-col lg:flex-row lg:items-end justify-between mb-8 gap-6">
                     <div>
                       <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Networking CRM</h1>
@@ -834,65 +613,9 @@
                       </button>
                     </div>
                   </div>
-                  <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                    <div class="lg:col-span-1 space-y-6">
-                      <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm">
-                        <h3 class="text-lg font-bold mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
-                          <span class="material-symbols-outlined text-primary">coffee</span> Upcoming Chats
-                        </h3>
-                        <div class="space-y-4">
-                          <div class="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-700">
-                            <div class="flex justify-between items-start mb-2">
-                              <span class="text-[10px] font-bold bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 py-1 rounded-full uppercase">Today</span>
-                              <span class="text-xs text-slate-400">14:00</span>
-                            </div>
-                            <p class="font-bold text-sm text-slate-900 dark:text-white">Jordan Smith</p>
-                            <p class="text-xs text-slate-500">Sr. Designer at Acme Corp</p>
-                          </div>
-                          <div class="p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
-                            <div class="flex justify-between items-start mb-2">
-                              <span class="text-[10px] font-bold bg-slate-100 dark:bg-slate-700 text-slate-500 px-2 py-1 rounded-full uppercase">Thu, 12 Oct</span>
-                              <span class="text-xs text-slate-400">10:30</span>
-                            </div>
-                            <p class="font-bold text-sm text-slate-900 dark:text-white">Sarah Chen</p>
-                            <p class="text-xs text-slate-500">Tech Lead at FinStream</p>
-                          </div>
-                        </div>
-                        <button class="w-full mt-4 text-sm font-semibold text-primary py-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors">
-                          View Calendar
-                        </button>
-                      </div>
-                      <div class="bg-slate-900 text-white p-6 rounded-3xl border border-slate-800 relative overflow-hidden">
-                        <div class="absolute -top-12 -right-12 w-32 h-32 bg-premium opacity-10 rounded-full blur-2xl"></div>
-                        <div class="relative z-10">
-                          <div class="flex items-center gap-2 mb-3">
-                            <span class="material-symbols-outlined text-premium">auto_awesome</span>
-                            <span class="text-[10px] font-bold uppercase tracking-widest text-premium">AI Insights</span>
-                          </div>
-                          <h3 class="text-md font-bold mb-2">Network Health</h3>
-                          <p class="text-slate-400 text-xs leading-relaxed mb-4">You haven't reached out to 3 key contacts in over 30 days. Your outreach velocity is down 12%.</p>
-                          <button class="text-xs font-bold text-white underline decoration-premium underline-offset-4">Get outreach templates</button>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="lg:col-span-3 space-y-6">
-                      <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-wrap items-center gap-4">
-                        <div class="relative flex-1 min-w-[240px]">
-                          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-                          <input class="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-900 border-none rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-primary/20 transition-all outline-none" placeholder="Search by name, company, or role..." type="text"/>
-                        </div>
-                        <div class="flex items-center gap-2">
-                          <button class="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg flex items-center gap-2">
-                            <span class="material-symbols-outlined text-sm">filter_list</span> Filter
-                          </button>
-                          <button class="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg flex items-center gap-2">
-                            <span class="material-symbols-outlined text-sm">sort</span> Sort
-                          </button>
-                        </div>
-                      </div>
-                      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                          <!-- Content reused from previous code ... keeping placeholder to avoid repeating huge block unnecessarily -->
-                         <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 hover:border-primary/50 transition-all cursor-pointer group premium-border premium-glow">
+                  <!-- Contact Cards -->
+                  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                     <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 hover:border-primary/50 transition-all cursor-pointer group premium-border premium-glow">
                           <div class="flex justify-between items-start mb-4">
                             <div class="h-12 w-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-primary font-bold text-lg ring-2 ring-premium/20">
                               JS
@@ -903,44 +626,26 @@
                                 <div class="w-3 h-1.5 bg-premium rounded-full"></div>
                                 <div class="w-3 h-1.5 bg-premium rounded-full"></div>
                                 <div class="w-3 h-1.5 bg-premium rounded-full"></div>
-                                <div class="w-3 h-1.5 bg-premium rounded-full"></div>
+                                <div class="w-3 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full"></div>
                                 <div class="w-3 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full"></div>
                               </div>
                             </div>
                           </div>
                           <h4 class="font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">Jordan Smith</h4>
                           <p class="text-sm text-slate-500 dark:text-slate-400">Senior Product Designer</p>
-                          <div class="mt-1 flex items-center gap-1.5 text-xs text-slate-400">
-                            <span class="material-symbols-outlined text-sm">business</span>
-                            <span>Acme Corp</span>
-                          </div>
-                          <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center">
-                            <div class="flex items-center gap-1.5">
-                              <span class="material-symbols-outlined text-[16px] text-slate-400">history</span>
-                              <span class="text-xs text-slate-500">2 days ago</span>
-                            </div>
-                            <button class="p-2 text-primary hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors">
-                              <span class="material-symbols-outlined">send</span>
-                            </button>
-                          </div>
-                        </div>
-                      </div>
                     </div>
-                </div>
+                     <!-- More cards -->
+                  </div>
             </main>
 
             <!-- PROFILE VIEW -->
             <main id="view-profile" class="hidden p-6 max-w-7xl mx-auto animate-fadeIn pb-24">
-                 <!-- Content reused ... -->
                 <div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div class="flex items-start gap-6">
                   <div class="relative">
                     <div class="h-24 w-24 md:h-32 md:w-32 rounded-3xl bg-primary flex items-center justify-center text-3xl font-bold text-white ring-4 ring-white dark:ring-slate-900 shadow-xl overflow-hidden">
                       AR
                     </div>
-                    <button class="absolute -bottom-2 -right-2 bg-white dark:bg-slate-800 p-2 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-primary transition-colors">
-                      <span class="material-symbols-outlined text-sm">photo_camera</span>
-                    </button>
                   </div>
                   <div>
                     <div class="flex items-center gap-3 mb-1">
@@ -950,84 +655,33 @@
                       </span>
                     </div>
                     <p class="text-slate-500 dark:text-slate-400 text-lg">Product Designer & Frontend Enthusiast</p>
-                    <div class="flex flex-wrap items-center gap-4 mt-4 text-sm text-slate-500 dark:text-slate-400">
-                      <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-base text-primary">location_on</span> San Francisco, CA</span>
-                      <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-base text-primary">mail</span> alex.rivera@example.com</span>
-                      <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-base text-primary">link</span> portfolio.design/alex</span>
-                    </div>
                   </div>
-                </div>
-                <div class="flex gap-3">
-                  <button class="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-slate-700 dark:text-slate-200">Edit Profile</button>
-                  <button class="px-5 py-2.5 rounded-xl bg-primary text-white font-semibold shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition-all flex items-center gap-2">
-                    <span class="material-symbols-outlined text-base">share</span> Share Profile
-                  </button>
                 </div>
               </div>
               <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 <div class="lg:col-span-8 space-y-8">
+                  <!-- Resume Section -->
                   <section class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
                     <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
                       <h2 class="text-lg font-bold flex items-center gap-2 text-slate-900 dark:text-white">
                         <span class="material-symbols-outlined text-primary">description</span> Professional Resume
                       </h2>
-                      <span class="text-xs font-medium text-slate-400 uppercase tracking-wider italic">Last updated 2 days ago</span>
                     </div>
-                    <div class="p-8">
-                      <div class="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl p-10 flex flex-col items-center justify-center text-center hover:border-primary/50 transition-colors cursor-pointer group bg-slate-50/50 dark:bg-slate-900/50">
-                        <div class="h-16 w-16 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-transform">
-                          <span class="material-symbols-outlined text-3xl text-primary">cloud_upload</span>
-                        </div>
-                        <p class="text-slate-900 dark:text-white font-semibold">Drop your updated resume here</p>
-                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">PDF or DOCX, max 5MB. AI will automatically scan for new skills.</p>
-                        <button class="mt-6 text-sm font-bold text-primary hover:underline">Or browse files from your computer</button>
-                      </div>
-                      <div class="mt-6 flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800">
-                        <div class="flex items-center gap-3">
+                    <div class="p-8 flex items-center justify-between bg-slate-50 dark:bg-slate-900/50 m-6 rounded-xl border border-slate-100 dark:border-slate-800">
+                         <div class="flex items-center gap-3">
                           <div class="h-10 w-10 bg-red-100 dark:bg-red-900/30 rounded flex items-center justify-center text-red-600">
                             <span class="material-symbols-outlined">picture_as_pdf</span>
                           </div>
                           <div>
-                            <p class="text-sm font-bold text-slate-900 dark:text-white">Alex_Rivera_Resume_2024.pdf</p>
+                            <p class="text-sm font-bold text-slate-900 dark:text-white">Alex_Rivera_Resume_2026.pdf</p>
                             <p class="text-xs text-slate-500">1.2 MB • Scanned & Optimized</p>
                           </div>
                         </div>
-                        <div class="flex items-center gap-2">
-                          <button class="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors text-slate-500">
-                            <span class="material-symbols-outlined text-xl">visibility</span>
-                          </button>
-                          <button class="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors text-slate-500">
-                            <span class="material-symbols-outlined text-xl">download</span>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </section>
-                  <section class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
-                    <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
-                      <div class="flex flex-col">
-                        <h2 class="text-lg font-bold flex items-center gap-2 text-slate-900 dark:text-white">
-                          <span class="material-symbols-outlined text-premium">verified</span> Top Skills
-                        </h2>
-                        <p class="text-xs text-slate-500 mt-0.5 font-medium">Verified by JobTrack AI based on your experience</p>
-                      </div>
-                      <button class="text-sm font-bold text-primary">Manage Skills</button>
-                    </div>
-                    <div class="p-6">
-                      <div class="flex flex-wrap gap-3">
-                        <div class="flex items-center gap-2 bg-amber-50 dark:bg-amber-900/20 border border-premium/30 px-4 py-2 rounded-xl">
-                          <span class="text-sm font-bold text-slate-900 dark:text-white">Product Strategy</span>
-                          <span class="material-symbols-outlined text-premium text-base" title="Verified Expert">auto_awesome</span>
-                        </div>
-                        <div class="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 px-4 py-2 rounded-xl">
-                          <span class="text-sm font-bold text-slate-900 dark:text-white">UI/UX Design</span>
-                          <span class="material-symbols-outlined text-primary text-base">check_circle</span>
-                        </div>
-                      </div>
                     </div>
                   </section>
                 </div>
                 <div class="lg:col-span-4 space-y-8">
+                  <!-- Subscription Status -->
                   <section id="profile-subscription-card" class="bg-slate-900 text-white rounded-3xl border border-slate-800 relative overflow-hidden flex flex-col premium-border premium-glow">
                     <div class="absolute -top-12 -right-12 w-48 h-48 bg-premium opacity-10 rounded-full blur-3xl"></div>
                     <div class="p-8 relative z-10">
@@ -1036,35 +690,14 @@
                         <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-premium">Membership Status</span>
                       </div>
                       <h3 class="text-2xl font-bold mb-1 premium-gradient-text">Premium Gold</h3>
-                      <p class="text-slate-400 text-sm leading-relaxed mb-6">Your plan expires on Dec 31, 2024. You have active priority support and AI coaching enabled.</p>
-                      <div class="space-y-4 mb-8">
-                        <div class="flex items-center justify-between text-sm">
-                          <span class="text-slate-400">Monthly Usage</span>
-                          <span class="font-bold">82%</span>
-                        </div>
-                        <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                          <div class="bg-premium h-full w-[82%]"></div>
-                        </div>
-                      </div>
-                      <div class="grid grid-cols-1 gap-3">
-                        <button class="bg-white text-slate-900 w-full py-3 rounded-xl font-bold hover:bg-premium hover:text-white transition-all text-sm">Manage Subscription</button>
-                        <button class="bg-slate-800 text-white w-full py-3 rounded-xl font-bold hover:bg-slate-700 transition-all text-sm border border-slate-700">View Invoices</button>
-                      </div>
+                      <!-- UPDATED DATE -->
+                      <p class="text-slate-400 text-sm leading-relaxed mb-6">Your plan expires on Dec 31, 2026. You have active priority support and AI coaching enabled.</p>
+                      <button class="bg-white text-slate-900 w-full py-3 rounded-xl font-bold hover:bg-premium hover:text-white transition-all text-sm">Manage Subscription</button>
                     </div>
                   </section>
-                  <section class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
-                    <div class="p-6 border-b border-slate-100 dark:border-slate-700">
-                      <h2 class="text-lg font-bold text-slate-900 dark:text-white">Account Settings</h2>
-                    </div>
+                   <section class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
                     <div class="p-4 space-y-1">
-                       <a class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors group" href="#">
-                        <div class="flex items-center gap-3">
-                          <span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">lock</span>
-                          <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Privacy & Security</span>
-                        </div>
-                        <span class="material-symbols-outlined text-slate-300">chevron_right</span>
-                      </a>
-                       <a class="flex items-center justify-between p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors group" href="javascript:logout()">
+                       <a class="flex items-center justify-between p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors group cursor-pointer" onclick="logout()">
                         <div class="flex items-center gap-3">
                           <span class="material-symbols-outlined text-red-500">logout</span>
                           <span class="text-sm font-medium text-red-500">Sign Out</span>
@@ -1076,63 +709,112 @@
               </div>
             </main>
 
+            <!-- MOBILE NAVBAR (Fixed Bottom) -->
+            <nav id="mobile-navbar" class="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 z-[90] px-6 py-3 safe-area-pb flex justify-between items-center transition-all duration-300">
+                <button onclick="switchView('dashboard')" class="nav-btn-mobile flex flex-col items-center gap-1 text-primary group" id="nav-mob-dashboard">
+                    <div class="p-1.5 rounded-xl bg-blue-50 dark:bg-blue-900/30 group-active:scale-95 transition-all">
+                         <span class="material-symbols-outlined text-[24px]">dashboard</span>
+                    </div>
+                    <span class="text-[10px] font-medium">Home</span>
+                </button>
+                <button onclick="switchView('insights')" class="nav-btn-mobile flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 group" id="nav-mob-insights">
+                    <div class="p-1.5 rounded-xl group-active:scale-95 transition-all">
+                        <span class="material-symbols-outlined text-[24px]">analytics</span>
+                    </div>
+                    <span class="text-[10px] font-medium">Insights</span>
+                </button>
+                <button onclick="switchView('network')" class="nav-btn-mobile flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 group" id="nav-mob-network">
+                     <div class="p-1.5 rounded-xl group-active:scale-95 transition-all">
+                        <span class="material-symbols-outlined text-[24px]">group</span>
+                     </div>
+                    <span class="text-[10px] font-medium">Network</span>
+                </button>
+                <button onclick="switchView('profile')" class="nav-btn-mobile flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 group" id="nav-mob-profile">
+                     <div class="p-1.5 rounded-xl group-active:scale-95 transition-all">
+                        <span class="material-symbols-outlined text-[24px]">person</span>
+                     </div>
+                    <span class="text-[10px] font-medium">Profile</span>
+                </button>
+            </nav>
+
             <!-- ADD JOB MODAL -->
             <div id="add-job-modal" class="hidden fixed inset-0 z-[100] modal-overlay flex items-center justify-center p-4 animate-fadeIn">
-                <!-- Same modal code as before -->
                  <div class="bg-white dark:bg-slate-900 w-full max-w-5xl max-h-[90vh] rounded-[2rem] shadow-2xl flex flex-col md:flex-row overflow-hidden border border-slate-200 dark:border-slate-800 premium-border premium-glow">
-                  <div class="flex-1 p-8 md:p-10 overflow-y-auto custom-scrollbar">
-                    <div class="flex items-center justify-between mb-8">
-                      <div>
-                        <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Add New Job</h2>
-                        <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Track your next career milestone.</p>
-                      </div>
-                      <button onclick="toggleModal(false)" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+                  <!-- Modal Content -->
+                  <div class="flex-1 p-8 md:p-10 overflow-y-auto custom-scrollbar relative">
+                    <button onclick="toggleModal(false)" class="absolute top-6 right-6 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
                         <span class="material-symbols-outlined">close</span>
-                      </button>
-                    </div>
-                    <form class="space-y-6" onsubmit="event.preventDefault()">
+                    </button>
+                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-6">Add New Job</h2>
+                    <form class="space-y-6" onsubmit="event.preventDefault(); toggleModal(false);">
                       <div class="relative">
                         <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Job Listing URL</label>
-                        <div class="relative flex items-center">
-                          <input class="w-full pl-4 pr-32 py-3 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800/50 focus:ring-2 focus:ring-primary focus:border-primary transition-all text-slate-900 dark:text-white outline-none" placeholder="https://company.com/careers/job-123" type="url"/>
-                          <button class="absolute right-2 px-4 py-1.5 bg-primary text-white text-xs font-bold rounded-lg flex items-center gap-1.5 hover:bg-blue-700 transition-all" type="button">
-                            <span class="material-symbols-outlined text-sm">auto_fix_high</span>
-                            Smart-Add
-                          </button>
-                        </div>
-                        <p class="text-[10px] text-slate-500 mt-2 flex items-center gap-1">
-                          <span class="material-symbols-outlined text-[14px]">info</span>
-                          Paste a URL to automatically fill the fields below
-                        </p>
+                        <input class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800/50 text-slate-900 dark:text-white outline-none" placeholder="https://..." type="url"/>
                       </div>
-                      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                          <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Job Title</label>
-                          <input class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800/50 focus:ring-2 focus:ring-primary focus:border-primary text-slate-900 dark:text-white outline-none" placeholder="e.g. Senior Product Designer" type="text"/>
-                        </div>
-                        <div>
-                          <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Company</label>
-                          <input class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800/50 focus:ring-2 focus:ring-primary focus:border-primary text-slate-900 dark:text-white outline-none" placeholder="Company Name" type="text"/>
-                        </div>
-                      </div>
-                       <div class="flex items-center gap-4 pt-4 border-t border-slate-100 dark:border-slate-800">
-                        <button onclick="toggleModal(false)" class="flex-1 py-4 bg-primary text-white font-bold rounded-2xl shadow-lg shadow-primary/20 hover:bg-blue-700 transition-all" type="button">Save Application</button>
-                        <button onclick="toggleModal(false)" class="px-8 py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-bold rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all" type="button">Cancel</button>
+                      <div class="flex items-center gap-4 pt-4">
+                        <button class="flex-1 py-4 bg-primary text-white font-bold rounded-2xl shadow-lg hover:bg-blue-700 transition-all">Save</button>
                       </div>
                     </form>
                   </div>
                  </div>
-              </div>
+            </div>
+
+            <!-- BILLING MODAL (NEW) -->
+            <div id="billing-modal" class="hidden fixed inset-0 z-[100] modal-overlay flex items-center justify-center p-4 animate-fadeIn">
+                 <div class="bg-white dark:bg-slate-900 w-full max-w-4xl rounded-[2rem] shadow-2xl flex flex-col md:flex-row overflow-hidden border border-slate-200 dark:border-slate-800">
+                    <!-- Left: Benefits -->
+                    <div class="w-full md:w-2/5 bg-slate-900 text-white p-8 relative overflow-hidden flex flex-col justify-between">
+                         <div class="absolute -top-24 -right-24 w-64 h-64 bg-premium opacity-20 rounded-full blur-3xl"></div>
+                         <div class="relative z-10">
+                            <div class="flex items-center gap-2 mb-6">
+                                <span class="material-symbols-outlined text-premium">auto_awesome</span>
+                                <span class="font-bold text-lg tracking-wide">JobTrack <span class="text-premium">GOLD</span></span>
+                            </div>
+                            <h2 class="text-3xl font-bold mb-4 leading-tight">Accelerate Your <br/><span class="premium-gradient-text">Career Growth</span></h2>
+                            <ul class="space-y-4 mb-8">
+                                <li class="flex items-start gap-3 text-sm text-slate-200"><span class="material-symbols-outlined text-emerald-400 text-sm">check_circle</span> Unlimited Job Tracking</li>
+                                <li class="flex items-start gap-3 text-sm text-slate-200"><span class="material-symbols-outlined text-emerald-400 text-sm">check_circle</span> AI Resume Scanner</li>
+                                <li class="flex items-start gap-3 text-sm text-slate-200"><span class="material-symbols-outlined text-emerald-400 text-sm">check_circle</span> Interview Coach</li>
+                                <li class="flex items-start gap-3 text-sm text-slate-200"><span class="material-symbols-outlined text-emerald-400 text-sm">check_circle</span> Salary Benchmarking</li>
+                            </ul>
+                         </div>
+                    </div>
+                    <!-- Right: Pricing -->
+                    <div class="w-full md:w-3/5 p-8 md:p-12 bg-white dark:bg-slate-900 relative">
+                        <button onclick="closeBillingModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                        <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Choose your plan</h3>
+                        
+                        <!-- Toggle -->
+                        <div class="flex items-center justify-center mb-8 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl w-fit mx-auto">
+                            <button onclick="setBillingCycle('monthly')" id="btn-monthly" class="px-6 py-2 rounded-lg text-sm font-bold transition-all bg-white dark:bg-slate-700 shadow-sm text-slate-900 dark:text-white">Monthly</button>
+                            <button onclick="setBillingCycle('yearly')" id="btn-yearly" class="px-6 py-2 rounded-lg text-sm font-bold transition-all text-slate-500 hover:text-slate-700">Yearly <span class="text-[10px] text-emerald-600 bg-emerald-100 px-1 rounded">-30%</span></button>
+                        </div>
+
+                        <!-- Price Card -->
+                        <div class="border-2 border-premium/30 bg-premium/5 rounded-2xl p-6 mb-8 relative premium-glow text-center">
+                            <h4 class="font-bold text-lg text-slate-900 dark:text-white">JobTrack Gold</h4>
+                            <div class="flex items-end justify-center gap-1 my-2">
+                                <span class="text-4xl font-bold text-slate-900 dark:text-white" id="price-display">$19</span>
+                                <span class="text-slate-500 mb-1">/mo</span>
+                            </div>
+                            <p class="text-xs text-emerald-600 font-bold hidden" id="yearly-savings">Billed $144 yearly (Save $84)</p>
+                            <button onclick="confirmUpgrade()" class="mt-4 w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 py-3 rounded-xl font-bold shadow-lg hover:scale-[1.02] transition-transform">
+                                Upgrade Now
+                            </button>
+                        </div>
+                    </div>
+                 </div>
+            </div>
 
         </div> <!-- End App Content -->
     </div> <!-- End Main App -->
 
-    <!-- Hidden Root for React mount fallback -->
-    <div id="root" class="hidden"></div>
-
     <!-- Application Logic -->
     <script>
         let isPremiumUser = false;
+        let billingCycle = 'monthly';
         
         const PREMIUM_LOGO = "https://github.com/ManuelIturriaga/jobtrack-media/blob/main/Images/PremiumLogo.jpg?raw=true";
         const FREE_LOGO = "https://github.com/ManuelIturriaga/jobtrack-media/blob/main/Images/FreeLogo.jpg?raw=true";
@@ -1199,7 +881,6 @@
             const premiumInsights = document.getElementById('dashboard-premium-insights');
             const freeUpsell = document.getElementById('dashboard-free-upsell');
             
-            // Toggle visibility on dashboard elements
             if(isPremiumUser) {
                 premiumStats.classList.remove('hidden');
                 freeStats.classList.add('hidden');
@@ -1258,11 +939,20 @@
                 const el = document.getElementById(`view-${v}`);
                 if (el) el.classList.add('hidden');
                 
-                // Update nav button state
-                const navBtn = document.getElementById(`nav-${v}`);
+                // Reset Desktop Nav
+                const navBtn = document.getElementById(`nav-desk-${v}`);
                 if (navBtn) {
                     navBtn.classList.remove('text-primary', 'font-semibold', 'bg-blue-50', 'dark:bg-blue-900/20');
                     navBtn.classList.add('text-slate-500', 'dark:text-slate-400', 'hover:text-primary');
+                }
+
+                // Reset Mobile Nav
+                const mobBtn = document.getElementById(`nav-mob-${v}`);
+                if (mobBtn) {
+                     mobBtn.classList.remove('text-primary', '-translate-y-1');
+                     mobBtn.classList.add('text-slate-400');
+                     const iconBox = mobBtn.querySelector('div');
+                     if(iconBox) iconBox.classList.remove('bg-blue-50', 'dark:bg-blue-900/30');
                 }
             });
 
@@ -1270,14 +960,67 @@
             const selectedEl = document.getElementById(`view-${viewName}`);
             if (selectedEl) selectedEl.classList.remove('hidden');
 
-            // Set active nav button
-            const activeNavBtn = document.getElementById(`nav-${viewName}`);
+            // Active Desktop Nav
+            const activeNavBtn = document.getElementById(`nav-desk-${viewName}`);
             if (activeNavBtn) {
                 activeNavBtn.classList.remove('text-slate-500', 'dark:text-slate-400', 'hover:text-primary');
                 activeNavBtn.classList.add('text-primary', 'font-semibold', 'bg-blue-50', 'dark:bg-blue-900/20');
             }
+
+            // Active Mobile Nav
+             const activeMobBtn = document.getElementById(`nav-mob-${viewName}`);
+             if (activeMobBtn) {
+                 activeMobBtn.classList.remove('text-slate-400');
+                 activeMobBtn.classList.add('text-primary', '-translate-y-1');
+                 const iconBox = activeMobBtn.querySelector('div');
+                 if(iconBox) iconBox.classList.add('bg-blue-50', 'dark:bg-blue-900/30');
+            }
         }
 
+        // --- BILLING LOGIC ---
+        function openBillingModal() {
+            document.getElementById('billing-modal').classList.remove('hidden');
+        }
+
+        function closeBillingModal() {
+            document.getElementById('billing-modal').classList.add('hidden');
+        }
+
+        function setBillingCycle(cycle) {
+            billingCycle = cycle;
+            const btnMonthly = document.getElementById('btn-monthly');
+            const btnYearly = document.getElementById('btn-yearly');
+            const priceDisplay = document.getElementById('price-display');
+            const savingsDisplay = document.getElementById('yearly-savings');
+
+            if(cycle === 'monthly') {
+                btnMonthly.classList.add('bg-white', 'dark:bg-slate-700', 'shadow-sm', 'text-slate-900', 'dark:text-white');
+                btnMonthly.classList.remove('text-slate-500');
+                
+                btnYearly.classList.remove('bg-white', 'dark:bg-slate-700', 'shadow-sm', 'text-slate-900', 'dark:text-white');
+                btnYearly.classList.add('text-slate-500');
+
+                priceDisplay.innerText = '$19';
+                savingsDisplay.classList.add('hidden');
+            } else {
+                btnYearly.classList.add('bg-white', 'dark:bg-slate-700', 'shadow-sm', 'text-slate-900', 'dark:text-white');
+                btnYearly.classList.remove('text-slate-500');
+                
+                btnMonthly.classList.remove('bg-white', 'dark:bg-slate-700', 'shadow-sm', 'text-slate-900', 'dark:text-white');
+                btnMonthly.classList.add('text-slate-500');
+
+                priceDisplay.innerText = '$12';
+                savingsDisplay.classList.remove('hidden');
+            }
+        }
+
+        function confirmUpgrade() {
+            isPremiumUser = true;
+            closeBillingModal();
+            updateUIBasedOnTier();
+            alert("Welcome to Premium Gold! 🚀");
+        }
+        
         function toggleModal(show) {
             const modal = document.getElementById('add-job-modal');
             if (show) {

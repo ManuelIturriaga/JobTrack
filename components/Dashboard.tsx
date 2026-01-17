@@ -42,8 +42,11 @@ const Dashboard: React.FC<DashboardProps> = ({ isPremium, onUpgrade, onAddJob, o
           </div>
 
           {/* Match Score Stat - Dynamic based on Tier */}
-          <div className={`bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border flex items-center gap-4 min-w-[200px] transition-all ${isPremium ? 'premium-border shadow-premium border-premium/30' : 'border-slate-200 dark:border-slate-700 opacity-80'}`}>
-            <div className={`p-2 rounded-lg ${isPremium ? 'bg-amber-100 dark:bg-amber-900/30 text-premium' : 'bg-slate-100 dark:bg-slate-700 text-slate-400'}`}>
+          <div 
+            onClick={!isPremium ? onUpgrade : undefined}
+            className={`bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border flex items-center gap-4 min-w-[200px] transition-all ${isPremium ? 'premium-border shadow-premium border-premium/30' : 'border-slate-200 dark:border-slate-700 cursor-pointer hover:border-premium/50 group'}`}
+          >
+            <div className={`p-2 rounded-lg ${isPremium ? 'bg-amber-100 dark:bg-amber-900/30 text-premium' : 'bg-slate-100 dark:bg-slate-700 text-slate-400 group-hover:text-premium group-hover:bg-amber-50 transition-colors'}`}>
                {isPremium ? <Sparkles size={24} /> : <Lock size={24} />}
             </div>
             <div>
@@ -55,7 +58,7 @@ const Dashboard: React.FC<DashboardProps> = ({ isPremium, onUpgrade, onAddJob, o
               {isPremium ? (
                  <p className="text-xl font-bold">88<span className="text-sm font-medium text-slate-400">/100</span></p>
               ) : (
-                 <p className="text-sm font-medium italic text-slate-400">Upgrade for insights</p>
+                 <p className="text-sm font-medium italic text-slate-400 group-hover:text-primary underline decoration-dotted">Upgrade to view</p>
               )}
             </div>
           </div>
@@ -70,7 +73,7 @@ const Dashboard: React.FC<DashboardProps> = ({ isPremium, onUpgrade, onAddJob, o
       </div>
 
       {/* Kanban Board */}
-      <div className="flex gap-6 overflow-x-auto pb-8 snap-x">
+      <div className="flex gap-6 overflow-x-auto pb-8 snap-x no-scrollbar">
         {columns.map((col) => (
             <div key={col.id} className="flex-1 min-w-[320px] snap-start">
                 <div className="flex items-center justify-between mb-4 px-1">

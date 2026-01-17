@@ -168,7 +168,7 @@ const Profile: React.FC = () => {
                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-premium">Membership Status</span>
               </div>
               <h3 className="text-2xl font-bold mb-1 premium-gradient-text">Premium Gold</h3>
-              <p className="text-slate-400 text-sm leading-relaxed mb-6">Your plan expires on Dec 31, 2024. You have active priority support and AI coaching enabled.</p>
+              <p className="text-slate-400 text-sm leading-relaxed mb-6">Your plan expires on Dec 31, 2026. You have active priority support and AI coaching enabled.</p>
               <div className="space-y-4 mb-8">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-slate-400">Monthly Usage</span>
