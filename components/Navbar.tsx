@@ -1,18 +1,32 @@
 import React from 'react';
-import { LayoutDashboard, LineChart, Users, Moon, Sun } from 'lucide-react';
 import { IMAGES } from '../constants';
+import { LayoutDashboard, LineChart, Users, Moon, Sun } from 'lucide-react';
 
 interface NavbarProps {
   isPremium: boolean;
   toggleTheme: () => void;
   isDarkMode: boolean;
+  currentPage: string;
+  onNavigate: (page: 'dashboard' | 'insights' | 'network' | 'profile') => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ isPremium, toggleTheme, isDarkMode }) => {
+const Navbar: React.FC<NavbarProps> = ({ isPremium, toggleTheme, isDarkMode, currentPage, onNavigate }) => {
+  const getLinkClass = (page: string) => {
+    const isActive = currentPage === page;
+    return `flex items-center gap-2 px-3 py-2 rounded-lg transition-all cursor-pointer ${
+      isActive 
+        ? 'text-primary font-semibold bg-blue-50 dark:bg-blue-900/20' 
+        : 'text-slate-500 dark:text-slate-400 hover:text-primary'
+    }`;
+  };
+
   return (
     <nav className="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-6 py-3 flex items-center justify-between transition-colors duration-300">
-      {/* Dynamic Logo Section based on User Request */}
-      <div className="flex items-center gap-4">
+      {/* Dynamic Logo Section */}
+      <div 
+        className="flex items-center gap-4 cursor-pointer"
+        onClick={() => onNavigate('dashboard')}
+      >
         <div className="relative group">
           <img 
             alt={isPremium ? "JobTrack Premium Logo" : "JobTrack Free Logo"} 
@@ -34,15 +48,15 @@ const Navbar: React.FC<NavbarProps> = ({ isPremium, toggleTheme, isDarkMode }) =
       </div>
 
       <div className="hidden md:flex items-center gap-8 ml-12">
-        <a href="#" className="text-primary font-semibold flex items-center gap-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 px-3 py-2 rounded-lg transition-all">
+        <button onClick={() => onNavigate('dashboard')} className={getLinkClass('dashboard')}>
           <LayoutDashboard size={20} /> Dashboard
-        </a>
-        <a href="#" className="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors flex items-center gap-2 px-3 py-2">
+        </button>
+        <button onClick={() => onNavigate('insights')} className={getLinkClass('insights')}>
           <LineChart size={20} /> Insights
-        </a>
-        <a href="#" className="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors flex items-center gap-2 px-3 py-2">
+        </button>
+        <button onClick={() => onNavigate('network')} className={getLinkClass('network')}>
           <Users size={20} /> Network
-        </a>
+        </button>
       </div>
 
       <div className="flex items-center gap-4">
@@ -59,7 +73,10 @@ const Navbar: React.FC<NavbarProps> = ({ isPremium, toggleTheme, isDarkMode }) =
         
         <div className="h-8 w-[1px] bg-slate-200 dark:bg-slate-800"></div>
         
-        <div className="flex items-center gap-3">
+        <div 
+            className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => onNavigate('profile')}
+        >
           <div className="text-right hidden sm:block">
             <p className="text-sm font-semibold">Alex Rivera</p>
             <p className={`text-[10px] font-bold uppercase tracking-tighter ${isPremium ? 'text-premium' : 'text-slate-400'}`}>

@@ -1,7 +1,11 @@
 import React from 'react';
-import { TrendingUp, ArrowRight, Award, ShieldCheck } from 'lucide-react';
+import { TrendingUp, ArrowRight, Award } from 'lucide-react';
 
-const PremiumInsights: React.FC = () => {
+interface PremiumInsightsProps {
+    onViewFullReport: () => void;
+}
+
+const PremiumInsights: React.FC<PremiumInsightsProps> = ({ onViewFullReport }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fadeIn">
       {/* Main Stats Area */}
@@ -14,7 +18,10 @@ const PremiumInsights: React.FC = () => {
             </h2>
             <p className="text-slate-500 dark:text-slate-400 text-sm">Analysis of your current pipeline velocity and strategy.</p>
           </div>
-          <button className="text-sm font-bold text-primary flex items-center gap-1 hover:underline">
+          <button 
+            onClick={onViewFullReport}
+            className="text-sm font-bold text-primary flex items-center gap-1 hover:underline"
+          >
              View Full Report <ArrowRight size={16} />
           </button>
         </div>

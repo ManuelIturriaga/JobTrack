@@ -1,5 +1,5 @@
 import React from 'react';
-import { Briefcase, Sparkles, MoreHorizontal, Lock, ArrowRight, TrendingUp, Plus } from 'lucide-react';
+import { Briefcase, Sparkles, MoreHorizontal, Lock, Plus } from 'lucide-react';
 import { Job, MOCK_JOBS } from '../types';
 import JobCard from './JobCard';
 import PremiumInsights from './PremiumInsights';
@@ -8,9 +8,11 @@ import FreeUpsell from './FreeUpsell';
 interface DashboardProps {
   isPremium: boolean;
   onUpgrade: () => void;
+  onAddJob: () => void;
+  onViewFullInsights: () => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ isPremium, onUpgrade }) => {
+const Dashboard: React.FC<DashboardProps> = ({ isPremium, onUpgrade, onAddJob, onViewFullInsights }) => {
   const columns = [
     { title: 'Wishlist', id: 'wishlist', count: 8 },
     { title: 'Applied', id: 'applied', count: 12 },
@@ -19,7 +21,7 @@ const Dashboard: React.FC<DashboardProps> = ({ isPremium, onUpgrade }) => {
   ];
 
   return (
-    <main className="p-6 max-w-[1600px] mx-auto pb-24">
+    <main className="p-6 max-w-[1600px] mx-auto pb-24 animate-fadeIn">
       {/* Header & Stats */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-8 gap-6">
         <div>
@@ -58,7 +60,10 @@ const Dashboard: React.FC<DashboardProps> = ({ isPremium, onUpgrade }) => {
             </div>
           </div>
 
-          <button className="bg-primary text-white px-6 py-3 rounded-xl font-semibold shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition-all flex items-center gap-2">
+          <button 
+            onClick={onAddJob}
+            className="bg-primary text-white px-6 py-3 rounded-xl font-semibold shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition-all flex items-center gap-2"
+          >
             <Plus size={20} /> Add New Job
           </button>
         </div>
@@ -96,7 +101,11 @@ const Dashboard: React.FC<DashboardProps> = ({ isPremium, onUpgrade }) => {
 
       {/* Insights Section - Switches based on tier */}
       <div className="mt-8">
-          {isPremium ? <PremiumInsights /> : <FreeUpsell onUpgrade={onUpgrade} />}
+          {isPremium ? (
+            <PremiumInsights onViewFullReport={onViewFullInsights} />
+          ) : (
+            <FreeUpsell onUpgrade={onUpgrade} />
+          )}
       </div>
     </main>
   );

@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Dashboard from './components/Dashboard';
+import Insights from './components/Insights';
+import Network from './components/Network';
+import Profile from './components/Profile';
+import AddJobModal from './components/AddJobModal';
 
 const App: React.FC = () => {
   const [isPremium, setIsPremium] = useState<boolean>(true);
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState<'dashboard' | 'insights' | 'network' | 'profile'>('dashboard');
+  const [isAddJobModalOpen, setIsAddJobModalOpen] = useState<boolean>(false);
 
   // Handle Dark Mode Class on Body/HTML
   useEffect(() => {
@@ -19,18 +25,48 @@ const App: React.FC = () => {
   const toggleTheme = () => setIsDarkMode(!isDarkMode);
   const togglePremium = () => setIsPremium(!isPremium);
 
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'dashboard':
+        return (
+          <Dashboard 
+            isPremium={isPremium} 
+            onUpgrade={() => setIsPremium(true)}
+            onAddJob={() => setIsAddJobModalOpen(true)}
+            onViewFullInsights={() => setCurrentPage('insights')}
+          />
+        );
+      case 'insights':
+        return <Insights />;
+      case 'network':
+        return <Network />;
+      case 'profile':
+        return <Profile />;
+      default:
+        return <Dashboard 
+          isPremium={isPremium} 
+          onUpgrade={() => setIsPremium(true)}
+          onAddJob={() => setIsAddJobModalOpen(true)}
+          onViewFullInsights={() => setCurrentPage('insights')}
+        />;
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 transition-colors duration-200">
+    <div className="min-h-screen bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 transition-colors duration-200 font-sans">
       <Navbar 
         isPremium={isPremium} 
         toggleTheme={toggleTheme}
         isDarkMode={isDarkMode}
+        currentPage={currentPage}
+        onNavigate={setCurrentPage}
       />
       
-      <Dashboard 
-        isPremium={isPremium} 
-        onUpgrade={() => setIsPremium(true)}
-      />
+      {renderPage()}
+
+      {isAddJobModalOpen && (
+        <AddJobModal onClose={() => setIsAddJobModalOpen(false)} />
+      )}
 
       {/* Floating Toggle for Demo Purposes */}
       <div className="fixed bottom-6 right-6 flex flex-col gap-2 z-50">
